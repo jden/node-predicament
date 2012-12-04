@@ -25,20 +25,40 @@ Predicament helps you normalize these in ways node can use, converting between f
 		}
 
 		var server = require('http').createServer(function (req, res) {
-				predicament.or()
-				predicament.and()
-				predicament.is()
+				predicament.If(
+					predicament.or(
+						predicament.toAsyncPredicate(debugMode),
+						predicament.toAsyncPredicate(checkUserIsAuthorized)
+					)
+				).Else(function () {
+					res.statusCode = 403;
+					res.end('unauthorized');
+				}
 		})
 
-		predicament.is(true, cb).else(cb)
+If
+Else
 
 or - series, operand B is only evaluated if operand A is false
 and - series, operand B is only evaluated if operand A is true
 any - parallel, all operands are evaluated in parallel, and the operation is true whenever the first operand returns true, or false when all operands return false
 all - parallel, all operands are evaluated in parallel, and the operation is false whenever the first operand returns false, or true when all operands return true
 
-.toPredicate
-.toAsyncPredicate
+-----------------------------------------------------------
+combinator | associativity    | flow     | boolean operator
+-----------------------------------------------------------
+or         | left-associative | serial   | or
+any        | non-associative  | parallel | or
+and        | left-associative | parallel | and
+all        | non-associative  | parallel | and
+
+		predicament.If(userLoggedIn('capn_blorg'),
+			function () {
+			console.log('hello his blorgness!')
+		}).Else(function (err) {
+			if (err) console.err('something borkt');
+			console.log('wait a minute - you're not blog! guards! guards!)
+		})
 
 # License
-MIT. (c) 2012 jden - Jason Denizac <jason@denizac.org>
+MIT. (c) 2012 jden - Jason Denizac <jason@denizac.org>. http://jden.mit-license.org/2012
