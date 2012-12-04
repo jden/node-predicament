@@ -230,6 +230,15 @@ describe('predicate builder', function () {
     });
     describe('toAsyncPredicate', function () {
       it('turns a plain old predicate into a nullary asynchronous node-style (error-first) predicate', function (done) {
+        var val = function () { return true; };
+        var p = predicament.toAsyncPredicate(val);
+        p(function (err, bool) {
+          assert(!err);
+          assert(bool === true);
+          done();
+        });
+      });
+      it('turns a constant value into a nullary asynchronous node-style (error-first) predicate', function (done) {
         var val = true;
         var p = predicament.toAsyncPredicate(val);
         p(function (err, bool) {
