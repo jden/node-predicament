@@ -1,5 +1,5 @@
 # predicament
-a predicate factory and normalizer
+asynchronous boolean logic and If-Then-Else branching
 
 a predicate is a function that returns a boolean value describing some criteria. Consider:
 
