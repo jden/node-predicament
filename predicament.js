@@ -81,8 +81,8 @@ If.prototype.Else = function (elseConsequent) {
 
 //
 var predicament = function(criteria) {
+  var predicate;
   if (typeof criteria !== 'function') {
-  	var predicate;
   	if (criteria in predicament) {
   		predicate = predicament[criteria];
   	} else {
