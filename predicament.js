@@ -81,9 +81,15 @@ var predicament = function(criteria) {
   return asyncify.constant(criteria);
 };
 
+function ensureCombinant(combinant) {
+  if (typeof combinant === 'function') return combinant;
+  return asyncify.constant(!!combinant);
+}
+
 predicament.and = function() {
   var combinants = toArray(arguments);
   var cb = combinants.pop();
+  combinants = combinants.map(ensureCombinant);
 
   async.forEachSeries(combinants, function (combinant, next) {
     combinant(function (err, val) {
@@ -99,6 +105,7 @@ predicament.and = function() {
 predicament.all = function() {
   var combinants = toArray(arguments);
   var cb = combinants.pop();
+  combinants = combinants.map(ensureCombinant);
   var n = combinants.length;
   combinants.forEach(function (combinant) {
     combinant(resolve);
@@ -124,6 +131,7 @@ predicament.all = function() {
 predicament.or = function () {
   var combinants = toArray(arguments);
   var cb = combinants.pop();
+  combinants = combinants.map(ensureCombinant);
 
   async.forEachSeries(combinants, function (combinant, next) {
     combinant(function (err, val) {
@@ -139,6 +147,7 @@ predicament.or = function () {
 predicament.any = function () {
   var combinants = toArray(arguments);
   var cb = combinants.pop();
+  combinants = combinants.map(ensureCombinant);
   var n = combinants.length;
   combinants.forEach(function (combinant) {
     combinant(resolve);

@@ -122,6 +122,18 @@ describe('predicate builder', function () {
           done();
         });
     });
+    it('supports mixing regular values with functions', function (done) {
+      predicament.and(true,'sdf',eventually.K(true), function (err, bool) {
+        assert(!err);
+        assert(bool === true);
+
+        predicament.and(undefined, function (err, bool) {
+          assert(!err);
+          assert(bool === false);
+          done();
+        });
+      });
+    });
   });
 
   describe('predicament.all', function () {
@@ -157,6 +169,18 @@ describe('predicate builder', function () {
           done();
         });
     });
+    it('supports mixing regular values with functions', function (done) {
+      predicament.all(true,'sdf',eventually.K(true), function (err, bool) {
+        assert(!err);
+        assert(bool === true);
+
+        predicament.all(undefined, function (err, bool) {
+          assert(!err);
+          assert(bool === false);
+          done();
+        });
+      });
+    });
   });
 
   describe('predicament.or', function () {
@@ -182,7 +206,18 @@ describe('predicate builder', function () {
         }
       );
     });
+    it('supports mixing regular values with functions', function (done) {
+      predicament.or(undefined,'',eventually.K(true), function (err, bool) {
+        assert(!err);
+        assert(bool === true);
 
+        predicament.all(undefined, function (err, bool) {
+          assert(!err);
+          assert(bool === false);
+          done();
+        });
+      });
+    });
   });
 
   describe('predicament.any', function () {
@@ -217,6 +252,18 @@ describe('predicate builder', function () {
           assert(bool === true);
           done();
         });
+    });
+    it('supports mixing regular values with functions', function (done) {
+      predicament.any(undefined,'',eventually.K(true), function (err, bool) {
+        assert(!err);
+        assert(bool === true);
+
+        predicament.all(undefined, function (err, bool) {
+          assert(!err);
+          assert(bool === false);
+          done();
+        });
+      });
     });
   });
 
