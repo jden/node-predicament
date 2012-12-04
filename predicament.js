@@ -82,9 +82,9 @@ If.prototype.Else = function (elseConsequent) {
 //
 var predicament = function(criteria) {
   if (typeof criteria === 'function') {
-    return nodeAsyncify(criteria);
+    return asyncify(criteria);
   }
-  return nodeAsyncify.constant(criteria);
+  return asyncify.constant(criteria);
 };
 
 predicament.and = function() {

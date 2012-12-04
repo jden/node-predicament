@@ -1,6 +1,6 @@
 var predicament = require('../predicament');
 var assert = require('assert');
-var eventually = require('nodeasyncify');
+var eventually = require('node-asyncify');
 
 assert.unreachable = function () {
   assert.fail(false, true, 'this code branch should not be reachable');
