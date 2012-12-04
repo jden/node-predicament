@@ -25,13 +25,7 @@ function toAsyncPredicate(predicate) {
 }
 
 function errorFirstify(valueFirstCbReturningFn) {
-  return function () {
-    var args = toArray(arguments);
-    var cb = args.pop();
-    valueFirstCbReturningFn.apply(this, args.concat(function (val) {
-      cb(null, val);
-    }));
-  };
+  return asyncify.errorFirstify(valueFirstCbReturningFn);
 }
 
 var If = function (predicate, consequent) {
