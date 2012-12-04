@@ -18,23 +18,23 @@ Predicament helps you normalize these in ways node can use, converting between f
 ## Usage example
 
 		var predicament = require('predicament');
+		var asyncify = require('node-asyncify');
 
 		var debugMode = false;
-		var checkUserIsAuthorized = function (user) {
+		var checkUserIsAuthorized = function () {
+				// seems legit
 				return Math.random() > .5;
+			}
 		}
 
 		var server = require('http').createServer(function (req, res) {
 				predicament.If(
-					predicament.or(
-						predicament.toAsyncPredicate(debugMode),
-						predicament.toAsyncPredicate(checkUserIsAuthorized)
-					)
+					predicament.or(debugMode, asyncify(checkUserIsAuthorized))
 				).Else(function () {
 					res.statusCode = 403;
 					res.end('unauthorized');
 				}
-		})
+		}).listen(2323);
 
 If
 Else
