@@ -1,6 +1,6 @@
 {
   "name": "predicament",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "asynchronous boolean logic and If-Then-Else branching",
   "main": "predicament.js",
   "directories": {
