@@ -45,7 +45,6 @@ describe('predicament', function () {
     });
   });
 
-
   it('calls the elseConsequent with an error argument if an error was returned by the predicate', function (done) {
     predicament.If(eventually.error('fail'), function () {
       assert.unreachable();
@@ -56,13 +55,12 @@ describe('predicament', function () {
       done();
     });
   });
-
 });
 
 describe('predicate builder', function () {
 // builds async predicates for use with predicament.If
 
-  describe('predicate', function () {
+  describe('predicament', function () {
     it('turns a constant value of a variable into an async nullary constant predicate', function (done) {
       var isTrue = true,
           p = predicament(true);
@@ -77,19 +75,105 @@ describe('predicate builder', function () {
 
     });
 
-    it('turns a synchronous nullary predicate into an async nullary predicate', function (done) {
-      var isTrue = function() {
-        return true;
-      };
-      var p = predicament(isTrue);
+    // todo: think of a way to make this work...
+    // maybe check for non-undefined return value and wrap it in asyncify.K?
+    // it('turns a synchronous nullary predicate into an async nullary predicate', function (done) {
+    //   var isTrue = function() {
+    //     return true;
+    //   };
+    //   var p = predicament(isTrue);
 
-      assert(typeof p === 'function');
-      p(function (err, bool) {
-        assert(!err, bool);
+    //   assert(typeof p === 'function');
+    //   p(function (err, bool) {
+    //     assert(!err);
+    //     assert(bool === true);
+    //     done();
+    //   });
+    // });
+
+    it('partially applies an n-ary async predicate into a nullary async predicate', function (done) {
+      var eq = function (a, b, cb) {
+        cb(null, a === b);
+      };
+
+      eq(5, 5, function (err, bool) {
         assert(bool === true);
-        done();
+
+        var p = predicament(eq, 5, 5);
+        assert(typeof p === 'function');
+        p(function (err, bool) {
+          assert(!err);
+          assert(bool === true);
+          done();
+        });
+
+      });
+
+    });
+
+    describe('magic strings', function () {
+      var t = eventually.constant(true);
+      var f = eventually.constant(false);
+      it('takes `and` as a function', function (done) {
+        predicament.If(predicament('and', t, t), done);
+      });
+      it('takes `or` as a function', function (done) {
+        predicament.If(predicament('or', f, t), done);
+      });
+      it('takes `all` as a function', function (done) {
+        predicament.If(predicament('all', f, t))
+        .Then(function () { assert.unreachable(); })
+        .Else(function (err) {
+          assert(!err);
+          done();
+        });
+      });
+      it('takes `any` as a function', function (done) {
+        predicament.If(predicament('any', f, t), done);
       });
     });
+  });
+
+  describe('predicament.If', function () {
+    it('can take a predicate built up using predicament.and', function (done) {
+      var t = eventually.constant(true);
+
+      predicament.If(
+        predicament(predicament.and, t, t)
+      )
+      .Then(done)
+      .Else(function () { assert.unreachable(); });
+    });
+
+  });
+
+  describe('predicament.Else', function () {
+    it ('attaches an elseConsequent continuation which only fires if the predicate is false', function (done) {
+      var t = eventually.constant(true);
+      predicament.If(t).Else(function (err) {
+        assert(!err);
+        assert.unreachable();
+      });
+      // from a strange edge case where attaching an elseConsequent with no consequent called
+      // the elseConsequent when the predicate was true
+      setTimeout(done, 15);
+    });
+  });
+
+  describe('predicament.Then', function () {
+
+    it('can be used to attach a consequent', function (done) {
+      var t = eventually.constant(true);
+      predicament
+        .If(t)
+        .Then(function () {
+          done();
+        })
+        .Else(function () {
+          assert.unreachable();
+        });
+    });
+
   });
 
   describe('predicament.and', function(done) {

@@ -40,7 +40,7 @@ var If = function (predicate, consequent) {
   _cfg.promise.then(function (val) {
     if (val && _cfg.consequent) {
       _cfg.consequent();
-    } else if (_cfg.elseConsequent) {
+    } else if (!val && _cfg.elseConsequent) {
       _cfg.elseConsequent();
     }
   });
@@ -55,6 +55,12 @@ var If = function (predicate, consequent) {
     });
   });
 
+};
+
+If.prototype.Then = function (consequent) {
+	var _cfg = this._cfg;
+	_cfg.consequent = consequent;
+	return this;
 };
 
 If.prototype.Else = function (elseConsequent) {
@@ -75,10 +81,25 @@ If.prototype.Else = function (elseConsequent) {
 
 //
 var predicament = function(criteria) {
-  if (typeof criteria === 'function') {
-    return asyncify(criteria);
+  if (typeof criteria !== 'function') {
+  	var predicate;
+  	if (criteria in predicament) {
+  		predicate = predicament[criteria];
+  	} else {
+  		return asyncify.constant(criteria);
+  	}
+  } else {
+  	predicate = criteria;
   }
-  return asyncify.constant(criteria);
+	// it'd better be async-friendly already
+	var partialArgs = toArray(arguments).slice(1);
+	if (partialArgs.length === 0) {
+		return predicate;
+	}
+
+	return function (cb) {
+		predicate.apply(this, partialArgs.concat(cb));
+	};
 };
 
 function ensureCombinant(combinant) {
