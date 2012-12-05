@@ -145,6 +145,28 @@ describe('predicate builder', function () {
       .Else(function () { assert.unreachable(); });
     });
 
+    describe('magic strings', function () {
+      var t = eventually.constant(true);
+      var f = eventually.constant(false);
+      it('takes `and` as a function', function (done) {
+        predicament.If('and', t, t, done);
+      });
+      it('takes `or` as a function', function (done) {
+        predicament.If('or', f, t, done);
+      });
+      it('takes `all` as a function', function (done) {
+        predicament.If('all', f, t)
+        .Then(function () { assert.unreachable(); })
+        .Else(function (err) {
+          assert(!err);
+          done();
+        });
+      });
+      it('takes `any` as a function', function (done) {
+        predicament.If('any', f, t, done);
+      });
+    });
+
   });
 
   describe('predicament.Else', function () {

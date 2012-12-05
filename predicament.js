@@ -28,11 +28,33 @@ function errorFirstify(valueFirstCbReturningFn) {
   return asyncify.errorFirstify(valueFirstCbReturningFn);
 }
 
-var If = function (predicate, consequent) {
+var global = this;
+
+var If = function (/* varies */) {
+	var args = toArray(arguments);
+	var predicate;
+	var consequent;
+	var partialArgs;
+	if (args.length === 1 && typeof args[0] === 'object') {
+		predicate = args[0].predicate;
+		consequent = args[0].consequent;
+		partialArgs = args[0].partialArgs;
+	} else {
+		predicate = args.shift(); // first
+		consequent = args.pop(); // last
+	  var partialArgs = args; // whatever's left
+	}
+
   if (!(this instanceof If)) {
-    return new If(predicate, consequent);
+  	// TODO: be less hacky about instantiation / parameter overloads
+    return new If({
+    	predicate: predicate,
+    	consequent: consequent,
+    	partialArgs: partialArgs
+    });
   }
-  var _cfg = this._cfg = {
+
+	var _cfg = this._cfg = {
     consequent: consequent,
     promise: when.defer()
   };
@@ -44,6 +66,8 @@ var If = function (predicate, consequent) {
       _cfg.elseConsequent();
     }
   });
+
+  predicate = predicament.apply(global, [predicate].concat(partialArgs));
 
   process.nextTick(function () {
     predicate(function (err, val) {
