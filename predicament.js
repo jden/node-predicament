@@ -8,20 +8,20 @@ function toArray(arrLike) {
 
 // the K combinator is a function which returns a constant value
 function K(val) {
-	return function () {
-		return val;
-	};
+  return function () {
+    return val;
+  };
 }
 
 function toPredicate(bool) {
-	return K(bool);
+  return K(bool);
 }
 
 function toAsyncPredicate(predicate) {
-	if (typeof predicate === 'boolean') {
-		predicate = toPredicate(predicate);
-	}
-	return asyncify(predicate);
+  if (typeof predicate === 'boolean') {
+    predicate = toPredicate(predicate);
+  }
+  return asyncify(predicate);
 }
 
 function errorFirstify(valueFirstCbReturningFn) {
@@ -31,30 +31,30 @@ function errorFirstify(valueFirstCbReturningFn) {
 var global = this;
 
 var If = function (/* varies */) {
-	var args = toArray(arguments);
-	var predicate;
-	var consequent;
-	var partialArgs;
-	if (args.length === 1 && typeof args[0] === 'object') {
-		predicate = args[0].predicate;
-		consequent = args[0].consequent;
-		partialArgs = args[0].partialArgs;
-	} else {
-		predicate = args.shift(); // first
-		consequent = args.pop(); // last
-	  var partialArgs = args; // whatever's left
-	}
+  var args = toArray(arguments);
+  var predicate;
+  var consequent;
+  var partialArgs;
+  if (args.length === 1 && typeof args[0] === 'object') {
+    predicate = args[0].predicate;
+    consequent = args[0].consequent;
+    partialArgs = args[0].partialArgs;
+  } else {
+    predicate = args.shift(); // first
+    consequent = args.pop(); // last
+    var partialArgs = args; // whatever's left
+  }
 
   if (!(this instanceof If)) {
-  	// TODO: be less hacky about instantiation / parameter overloads
+    // TODO: be less hacky about instantiation / parameter overloads
     return new If({
-    	predicate: predicate,
-    	consequent: consequent,
-    	partialArgs: partialArgs
+      predicate: predicate,
+      consequent: consequent,
+      partialArgs: partialArgs
     });
   }
 
-	var _cfg = this._cfg = {
+  var _cfg = this._cfg = {
     consequent: consequent,
     promise: when.defer()
   };
@@ -82,9 +82,9 @@ var If = function (/* varies */) {
 };
 
 If.prototype.Then = function (consequent) {
-	var _cfg = this._cfg;
-	_cfg.consequent = consequent;
-	return this;
+  var _cfg = this._cfg;
+  _cfg.consequent = consequent;
+  return this;
 };
 
 If.prototype.Else = function (elseConsequent) {
@@ -107,23 +107,23 @@ If.prototype.Else = function (elseConsequent) {
 var predicament = function(criteria) {
   var predicate;
   if (typeof criteria !== 'function') {
-  	if (criteria in predicament) {
-  		predicate = predicament[criteria];
-  	} else {
-  		return asyncify.constant(criteria);
-  	}
+    if (criteria in predicament) {
+      predicate = predicament[criteria];
+    } else {
+      return asyncify.constant(criteria);
+    }
   } else {
-  	predicate = criteria;
+    predicate = criteria;
   }
-	// it'd better be async-friendly already
-	var partialArgs = toArray(arguments).slice(1);
-	if (partialArgs.length === 0) {
-		return predicate;
-	}
+  // it'd better be async-friendly already
+  var partialArgs = toArray(arguments).slice(1);
+  if (partialArgs.length === 0) {
+    return predicate;
+  }
 
-	return function (cb) {
-		predicate.apply(this, partialArgs.concat(cb));
-	};
+  return function (cb) {
+    predicate.apply(this, partialArgs.concat(cb));
+  };
 };
 
 function ensureCombinant(combinant) {
