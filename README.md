@@ -1,6 +1,8 @@
 # predicament
 asynchronous boolean logic and If-Then-Else branching
 
+** note - this documentation may be out of date. I will be updating it shortly. In the mean time, please run the (comprehensive) tests with `npm test` **
+
 a predicate is a function that returns a boolean value describing some criteria. Consider:
 
 	  if (isRegistered(user)) {
