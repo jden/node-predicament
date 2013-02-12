@@ -98,6 +98,20 @@ If.prototype.Else = function (elseConsequent) {
   return this;
 };
 
+
+// suitable for promises
+// sync: return x ? y : z
+// becomes: return predicament.Ternary(()=>x, ()=>y, ()=>z)
+//
+// make sure the arguments are nullary generator functions, rather than the
+// actual promises - otherwise you'll probably get surprising side effects
+// when the guard `x` doesn't prevent `z` from being evaluated.
+function Ternary (antecedent, trueConsequent, falseConsequent) {
+  return antecedent().then(function (val) {
+    return val ? trueConsequent() : falseConsequent();
+  })
+}
+
 //////////
 // predicate builder stuff
 //
@@ -218,4 +232,5 @@ predicament.If = If;
 predicament.toPredicate = toPredicate;
 predicament.toAsyncPredicate = toAsyncPredicate;
 predicament.errorFirstify = errorFirstify;
+predicament.Ternary = Ternary;
 module.exports = predicament;
